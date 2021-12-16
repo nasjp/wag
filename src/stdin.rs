@@ -34,19 +34,6 @@ impl StdinRawMode {
 		// Disable post processing of output
 		terminal.c_oflag &= !(OPOST);
 
-		/*
-		// Disable control flow mode (Ctrl+Q/Ctrl+S) and CR-to-NL translation
-		terminal.c_iflag &= !(IXON | ICRNL | BRKINT | INPCK | ISTRIP);
-		// Disable output processing such as \n to \r\n translation
-		terminal.c_oflag &= !OPOST;
-		// Ensure character size is 8bits
-		terminal.c_cflag |= CS8;
-		// Implement blocking read for efficient reading of input
-		terminal.c_cc[VMIN] = 1;
-		terminal.c_cc[VTIME] = 0;
-		// Apply terminal configurations
-		*/
-
 		tcsetattr(fd, TCSAFLUSH, &terminal)?;
 		Ok(StdinRawMode {
 			stdin,

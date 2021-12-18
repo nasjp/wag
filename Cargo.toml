@@ -1,5 +1,5 @@
 [package]
-name = "wag"
+name = "wia"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,7 @@ edition = "2021"
 
 [[bin]]
 path = "src/main.rs"
-name = "wag"
+name = "wia"
 
 [dependencies]
 termios = "0.3.3"

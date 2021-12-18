@@ -1,6 +1,6 @@
-use wag::Editor;
-use wag::Result;
-use wag::StdinRawMode;
+use wia::Editor;
+use wia::Result;
+use wia::StdinRawMode;
 
 fn main() -> Result<()> {
     let mut editor = Editor::new(StdinRawMode::enable()?)?;

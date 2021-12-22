@@ -1,6 +1,7 @@
 use std::fmt;
 use std::io::{self, Read, Write};
 use std::os::unix::io::AsRawFd;
+use std::str;
 use termios::{
     tcsetattr, Termios, BRKINT, CS8, ECHO, ICANON, ICRNL, IEXTEN, INPCK, ISIG, ISTRIP, IXON, OPOST,
     TCSAFLUSH, VMIN, VTIME,
@@ -25,16 +26,16 @@ fn editor_refresh_screen(stdout: &mut Stdout) -> Result<Option<u8>> {
     stdout.write_flush(b"\x1b[2J")?;
     stdout.write_flush(b"\x1b[H")?;
 
-    editor_draw_row(stdout, "~", 24)?;
+    editor_draw_row(stdout, b'~', 24)?;
 
     stdout.write_flush(b"\x1b[H")?;
 
     Ok(None)
 }
 
-fn editor_draw_row(stdout: &mut Stdout, header: &str, window_height: usize) -> Result<Option<u8>> {
+fn editor_draw_row(stdout: &mut Stdout, header: u8, window_height: usize) -> Result<Option<u8>> {
     for _ in 0..=window_height {
-        stdout.write_flush(format!("{}\r\n", header).as_bytes())?;
+        stdout.write_flush(format!("{}\r\n", str::from_utf8(&[header])?).as_bytes())?;
     }
 
     Ok(None)
@@ -133,6 +134,7 @@ impl Drop for StdinRawMode {
 #[derive(Debug)]
 pub enum Error {
     IoError(io::Error),
+    Utf8Error(str::Utf8Error),
     Quit,
 }
 
@@ -141,6 +143,7 @@ impl fmt::Display for Error {
         use Error::*;
         match self {
             IoError(err) => write!(f, "{}", err),
+            Utf8Error(err) => write!(f, "{}", err),
             Quit => write!(f, "quit"),
         }
     }
@@ -149,5 +152,11 @@ impl fmt::Display for Error {
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Error {
         Error::IoError(err)
+    }
+}
+
+impl From<str::Utf8Error> for Error {
+    fn from(err: str::Utf8Error) -> Error {
+        Error::Utf8Error(err)
     }
 }

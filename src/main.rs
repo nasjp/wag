@@ -7,8 +7,6 @@ use termios::{
     TCSAFLUSH, VMIN, VTIME,
 };
 
-pub type Result<T> = std::result::Result<T, Error>;
-
 fn main() -> Result<()> {
     let mut stdin = StdinRawMode::enable()?;
     let mut stdout = Stdout::new();
@@ -103,6 +101,10 @@ fn read_byte<R: Read>(reader: R) -> Result<Option<u8>> {
     }
 }
 
+fn ctrl_key(key: u8) -> u8 {
+    key & 0x1f
+}
+
 pub struct Stdout {
     stdout: io::Stdout,
 }
@@ -119,10 +121,6 @@ impl Stdout {
         self.stdout.flush()?;
         Ok(())
     }
-}
-
-fn ctrl_key(key: u8) -> u8 {
-    key & 0x1f
 }
 
 impl Drop for StdinRawMode {
@@ -160,3 +158,5 @@ impl From<str::Utf8Error> for Error {
         Error::Utf8Error(err)
     }
 }
+
+pub type Result<T> = std::result::Result<T, Error>;

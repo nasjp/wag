@@ -14,7 +14,10 @@ fn main() -> Result<()> {
     loop {
         editor_refresh_screen(&mut stdout)?;
         match editor_process_key_press(&mut stdin, ctrl_key(b'q')) {
-            Err(e) => return Err(e),
+            Err(e) => match e {
+                Error::Quit => return Ok(()),
+                _ => return Err(e),
+            },
             _ => continue,
         }
     }
